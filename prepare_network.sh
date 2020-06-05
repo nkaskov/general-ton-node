@@ -17,35 +17,19 @@ mkdir ../db/import
 mv basestate0.boc ../db/static/$BASESTATE0_FILEHASH
 cd ../db
 sed -e "s#ROOT_HASH#$(cat ../contracts/zerostate.rhash | base64)#g" -e "s#FILE_HASH#$(cat ../contracts/zerostate.fhash | base64)#g" ton-private-testnet.config.json.template > my-ton-global.config.json
-IP=$PUBLIC_IP; IPNUM=0; for (( i=0 ; i<4 ; ++i )); do ((IPNUM=$IPNUM+${IP%%.*}*$((256**$((3-${i})))))); IP=${IP#*.}; done
-[ $IPNUM -gt $((2**31)) ] && IPNUM=$(($IPNUM - $((2**32))))
 
-mkdir dht-server
+export DHT_SERVER=1
+
+./dht_init.sh
+
 cd dht-server
-cp ../my-ton-global.config.json .
-cp ../example.config.json .
-dht-server -C example.config.json -D . -I "$PUBLIC_IP:$DHT_PORT"
-
-DHT_NODES=$(generate-random-id -m dht -k keyring/* -a "{
-             \"@type\": \"adnl.addressList\",
-             \"addrs\": [
-               {
-                 \"@type\": \"adnl.address.udp\",
-                 \"ip\":  $IPNUM,
-                 \"port\": $DHT_PORT
-               }
-             ],
-             \"version\": 0,
-             \"reinit_date\": 0,
-             \"priority\": 0,
-             \"expire_at\": 0
-           }")
-
+DHT_NODES=$(cat ../dht_node.conf)
 sed -i -e "s#NODES#$(printf "%q" $DHT_NODES)#g" my-ton-global.config.json
 cp my-ton-global.config.json ..
-dht-server -C my-ton-global.config.json -D . -I "$PUBLIC_IP:$DHT_PORT"&
 cd ..
+
 ./node_init.sh
+
 (validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "127.0.0.1:$PUBLIC_PORT")&
 PRELIMINARY_VALIDATOR_RUN=$!
 sleep 4;
@@ -66,6 +50,7 @@ else
   sleep 10
   wget -O my-ton-global.config.json ${CONFIG}
   cat my-ton-global.config.json
+  ./dht_init.sh
   ./node_init.sh
 
 fi

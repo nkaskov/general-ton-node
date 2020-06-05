@@ -17,10 +17,17 @@ else
   ./prepare_network.sh
 fi
 
-if [[ "$GENESIS" == 1 ]]; then
+if [[ "$SERVECONFIG" == 1 ]]; then
    echo "Serving config"
-   python -m SimpleHTTPServer 8000&
+   python -m SimpleHTTPServer "$HTTPPORT" &
 fi
 
-echo "Start validator";
-validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$PUBLIC_IP:$PUBLIC_PORT"
+if [[ "$DHT_SERVER" == 1 ]]; then
+   echo "Start DHT server on $BIND_IP:$DHT_PORT"
+   cd dht-server
+   dht-server -C my-ton-global.config.json -D . -I "$BIND_IP:$DHT_PORT"&
+   cd ..
+fi
+
+echo "Start validator on $BIND_IP:$PUBLIC_PORT"
+validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$BIND_IP:$PUBLIC_PORT"
