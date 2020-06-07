@@ -24,17 +24,34 @@
 #For more information, please refer to <https://unlicense.org>
 # (c) Mercuryo and Viacheslav Akhmetov
 
+echo "Reap started"
+date -u
+date -u +%s
+
 LITECLIENT="lite-client"
 LITECLIENT_CONFIG="/var/ton-work/db/my-ton-global.config.json"
 FIFTBIN="fift"
 export FIFTPATH="/usr/local/lib/fift/"
-WALLET_ADDR=""
 WALLET_FIF=$CONTRACTS_PATH"wallet.fif"
 WALLETKEYS_DIR="/var/ton-work/contracts/"
 VALIDATOR_WALLET_FILEBASE="validator"
+WALLET_ADDR=$(cat $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE.hexaddr)
 
 ACTIVE_ELECTION_ID=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getconfig 1" |grep x{|sed -e 's/{/\ /g' -e 's/}//g'|awk {'print $2'})
 
+${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -rc "runmethod Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF compute_returned_stake 0x$(echo "${WALLET_ADDR}" | cut -d ':' -f 2)" -rc "quit" >"recover-state"
+awk '{
+        if ($1 == "result:") {
+            print $3
+        }
+    }' "recover-state" >"recover-amount"
+
+RETURNED_STAKE=$(cat "recover-amount")
+echo "Returned stake ${RETURNED_STAKE}"
+if [ "$RETURNED_STAKE" == "0" ]; then
+    echo "Nothing to return"
+    exit
+fi
 
 WALLET_SEQ=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
 

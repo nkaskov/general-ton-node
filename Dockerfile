@@ -36,6 +36,14 @@ COPY --from=builder /ton/crypto/smartcont /var/ton-work/contracts
 COPY --from=builder /ton/build/crypto/create-state /var/ton-work/contracts
 COPY --from=builder /ton/build/dht-server/dht-server /usr/local/bin
 
+WORKDIR /usr/local/bin
+COPY wallet_create.sh wallet_deploy.sh wallet_main_transfer.sh wallet_status.sh wallet_transfer.sh ./
+RUN chmod +x wallet_create.sh wallet_deploy.sh wallet_main_transfer.sh wallet_status.sh wallet_transfer.sh
+
+COPY validator_scripts/participate.sh validator_scripts/reap.sh ./
+RUN chmod +x participate.sh reap.sh
+
+RUN mkdir -p /var/ton-work/logs
 RUN mkdir -p /var/ton-work/db/keyring
 WORKDIR /var/ton-work/contracts
 COPY gen-zerostate.fif ./

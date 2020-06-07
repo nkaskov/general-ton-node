@@ -18,7 +18,8 @@ mv basestate0.boc ../db/static/$BASESTATE0_FILEHASH
 cd ../db
 sed -e "s#ROOT_HASH#$(cat ../contracts/zerostate.rhash | base64)#g" -e "s#FILE_HASH#$(cat ../contracts/zerostate.fhash | base64)#g" ton-private-testnet.config.json.template > my-ton-global.config.json
 
-export DHT_SERVER=1
+
+if [[ "$DHT_SERVER" == 1 ]]; then
 
 ./dht_init.sh
 
@@ -29,6 +30,15 @@ cp my-ton-global.config.json ..
 cd ..
 
 ./node_init.sh
+else
+
+./node_init.sh
+
+DHT_NODES=$(cat ./dht_validator.conf)
+sed -i -e "s#NODES#$(printf "%q" $DHT_NODES)#g" my-ton-global.config.json
+
+fi
+
 
 (validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "127.0.0.1:$PUBLIC_PORT")&
 PRELIMINARY_VALIDATOR_RUN=$!

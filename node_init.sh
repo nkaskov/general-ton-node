@@ -6,7 +6,35 @@ if [ ! -z "$PUBLIC_IP" ]; then
         CONSOLE_PORT="43678"
     fi
     echo -e "\e[1;32m[+]\e[0m Using provided IP: $PUBLIC_IP:$CONSOLE_PORT"
-    validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$PUBLIC_IP:$PUBLIC_PORT"
+    #validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$PUBLIC_IP:$PUBLIC_PORT"
+    if [[ "$DHT_SERVER" == 1 ]]; then
+        validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$PUBLIC_IP:$PUBLIC_PORT"
+    else
+        validator-engine -C /var/ton-work/db/example.config.json --db /var/ton-work/db --ip "$PUBLIC_IP:$PUBLIC_PORT"
+
+        echo "Generated keys:"
+        ls keyring/
+
+        IP=$PUBLIC_IP; IPNUM=0; for (( i=0 ; i<4 ; ++i )); do ((IPNUM=$IPNUM+${IP%%.*}*$((256**$((3-${i})))))); IP=${IP#*.}; done
+        [ $IPNUM -gt $((2**31)) ] && IPNUM=$(($IPNUM - $((2**32))))
+
+        DHT_NODES=$(generate-random-id -m dht -k /var/ton-work/db/keyring/* -a "{
+                    \"@type\": \"adnl.addressList\",
+                    \"addrs\": [
+                    {
+                        \"@type\": \"adnl.address.udp\",
+                        \"ip\":  $IPNUM,
+                        \"port\": $PUBLIC_PORT
+                    }
+                    ],
+                    \"version\": 0,
+                    \"reinit_date\": 0,
+                    \"priority\": 0,
+                    \"expire_at\": 0
+                }")
+        echo $DHT_NODES > ./dht_validator.conf
+    fi
+
 else
     echo -e "\e[1;31m[!]\e[0m No IP:PORT provided, exiting"
     exit 1

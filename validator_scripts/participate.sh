@@ -24,11 +24,15 @@
 #For more information, please refer to <https://unlicense.org>
 # (c) Mercuryo and Viacheslav Akhmetov
 
-WALLET_ADDR=""
-MAX_FACTOR=""
-STAKE_AMOUNT=""
+echo "Participate started"
+date -u
+date -u +%s
+
+MAX_FACTOR="3"
+STAKE_AMOUNT="10001"
 WALLETKEYS_DIR="/var/ton-work/contracts/"
 VALIDATOR_WALLET_FILEBASE="validator"
+WALLET_ADDR=$(cat $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE.hexaddr)
 
 #!/usr/bin/env bash
 set -euo pipefail
