@@ -10,7 +10,11 @@ if [[ "$DHT_SERVER" == 1 ]]; then
     cp ../example.config.json .
     dht-server -C example.config.json -D . -I "$PUBLIC_IP:$DHT_PORT"
 
-    DHT_NODES=$(generate-random-id -m dht -k keyring/* -a "{
+    key=$(ls keyring | head -1)
+
+    cp keyring/$key ./dht_key
+
+    DHT_NODES=$(generate-random-id -m dht -k ./dht_key -a "{
                 \"@type\": \"adnl.addressList\",
                 \"addrs\": [
                 {

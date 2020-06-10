@@ -1,187 +1,192 @@
-#!/bin/bash
+SC=../../scripts
 
-DOCKER_IMAGE="ppv/general-ton-node:0.1.0"
-LITE_PORT=46732
-HTTPPORT=8081
-
-docker volume create tondb0
-docker run -d --name ton-node-n0 --mount source=tondb0,target=/var/ton-work/db --network host \
--e "GENESIS=1" -e "SERVECONFIG=1" -e "HTTPPORT=${HTTPPORT}" -e "DHT_SERVER=1" -e "PUBLIC_IP=127.0.0.1" -e "BIND_IP=0.0.0.0" \
--e "PUBLIC_PORT=30310" -e "DHT_PORT=30303" -e "CONSOLE_PORT=50000" -e "LITESERVER=true" -e "LITE_PORT=${LITE_PORT}" \
--e "JSON_EXPLORER=1" -e "JSON_PORT=8082" -e "BLOCK_EXPLORER=1" -e "BLOCK_PORT=8083" \
--it $DOCKER_IMAGE
-
-docker logs --follow ton-node-n0 >> logs-node0.txt &
-
+cd node0
+$SC/docker_create_storage.sh
+$SC/docker_run.sh
+source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node0.txt &
 sleep 100
-
-docker cp ton-node-n0:/var/ton-work/db/my-ton-global.config.json .
-docker cp ton-node-n0:/var/ton-work/db/dht_validator.conf .
-docker cp ton-node-n0:/var/ton-work/contracts/main-wallet.addr .
-docker cp ton-node-n0:/var/ton-work/contracts/main-wallet.pk .
-docker cp ton-node-n0:/var/ton-work/db/liteserver.pub .
-docker cp ton-node-n0:/var/ton-work/logs/json-explorer.log .
-
-docker volume create tondb1
-docker run -d --name ton-node-n1 --mount source=tondb1,target=/var/ton-work/db --network host \
--e "CONFIG=http://127.0.0.1:${HTTPPORT}/my-ton-global.config.json" -e "DHT_SERVER=0" -e "PUBLIC_IP=127.0.0.1" -e "BIND_IP=0.0.0.0" \
--e "PUBLIC_PORT=30311" -e "DHT_PORT=30304" -e "CONSOLE_PORT=50001" -it $DOCKER_IMAGE
-docker logs --follow ton-node-n1 >> logs-node1.txt &
-sleep 60
-docker cp ton-node-n1:/var/ton-work/db/dht_node.conf ./dht_node1.conf
-docker cp ton-node-n1:/var/ton-work/db/dht_validator.conf ./dht_validator1.conf
-docker cp ton-node-n0:/var/ton-work/db/liteserver.pub liteserver1.pub
-
-docker volume create tondb2
-docker run -d --name ton-node-n2 --mount source=tondb2,target=/var/ton-work/db --network host \
--e "CONFIG=http://127.0.0.1:${HTTPPORT}/my-ton-global.config.json" -e "DHT_SERVER=0" -e "PUBLIC_IP=127.0.0.1" -e "BIND_IP=0.0.0.0" \
--e "PUBLIC_PORT=30312" -e "DHT_PORT=30305" -e "CONSOLE_PORT=50002" -it $DOCKER_IMAGE
-docker logs --follow ton-node-n2 >> logs-node2.txt &
-sleep 60
-docker cp ton-node-n2:/var/ton-work/db/dht_node.conf ./dht_node2.conf
-docker cp ton-node-n2:/var/ton-work/db/dht_validator.conf ./dht_validator2.conf
-docker cp ton-node-n0:/var/ton-work/db/liteserver.pub liteserver2.pub
-
-docker volume create tondb3
-docker run -d --name ton-node-n3 --mount source=tondb3,target=/var/ton-work/db --network host \
--e "CONFIG=http://127.0.0.1:${HTTPPORT}/my-ton-global.config.json" -e "DHT_SERVER=0" -e "PUBLIC_IP=127.0.0.1" -e "BIND_IP=0.0.0.0" \
--e "PUBLIC_PORT=30313" -e "DHT_PORT=30306" -e "CONSOLE_PORT=50003" -it $DOCKER_IMAGE
-docker logs --follow ton-node-n3 >> logs-node3.txt &
-sleep 60
-docker cp ton-node-n3:/var/ton-work/db/dht_node.conf ./dht_node3.conf
-docker cp ton-node-n3:/var/ton-work/db/dht_validator.conf ./dht_validator3.conf
-docker cp ton-node-n0:/var/ton-work/db/liteserver.pub liteserver3.pub
-
-echo "====================== Node0 stats"
-docker exec -it ton-node-n0 validator-engine-console -a 127.0.0.1:50000 -k client -p server.pub -c "getstats" -c "quit"
-echo "====================== Node1 stats"
-docker exec -it ton-node-n1 validator-engine-console -a 127.0.0.1:50001 -k client -p server.pub -c "getstats" -c "quit"
-echo "====================== Node2 stats"
-docker exec -it ton-node-n2 validator-engine-console -a 127.0.0.1:50002 -k client -p server.pub -c "getstats" -c "quit"
-echo "====================== Node3 stats"
-docker exec -it ton-node-n3 validator-engine-console -a 127.0.0.1:50003 -k client -p server.pub -c "getstats" -c "quit"
+$SC/docker_export_wallet.sh y
+$SC/docker_export_conf.sh
+$SC/docker_logs.sh
+cd ..
 
 
-# wallets creation
-docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && wallet_create.sh validator"
-docker cp ton-node-n0:/var/ton-work/contracts/validator.hexaddr ./validator0.hexaddr
-docker cp ton-node-n0:/var/ton-work/contracts/validator.pk ./validator0.pk
-V0_ADDR=$(cat validator0.hexaddr)
+cd node1
+$SC/docker_create_storage.sh
+$SC/docker_run.sh
+source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node1.txt &
+sleep 20
+$SC/docker_export_wallet.sh y
+$SC/docker_export_conf.sh
+$SC/docker_logs.sh
+cd ..
 
-docker exec -it ton-node-n1 bash -c "cd /var/ton-work/contracts && wallet_create.sh validator"
-docker cp ton-node-n1:/var/ton-work/contracts/validator.hexaddr ./validator1.hexaddr
-docker cp ton-node-n1:/var/ton-work/contracts/validator.pk ./validator1.pk
-V1_ADDR=$(cat validator1.hexaddr)
+cd node2
+$SC/docker_create_storage.sh
+$SC/docker_run.sh
+source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node2.txt &
+sleep 20
+$SC/docker_export_wallet.sh y
+$SC/docker_export_conf.sh
+$SC/docker_logs.sh
+cd ..
 
-docker exec -it ton-node-n2 bash -c "cd /var/ton-work/contracts && wallet_create.sh validator"
-docker cp ton-node-n2:/var/ton-work/contracts/validator.hexaddr ./validator2.hexaddr
-docker cp ton-node-n2:/var/ton-work/contracts/validator.pk ./validator2.pk
-V2_ADDR=$(cat validator2.hexaddr)
-
-docker exec -it ton-node-n3 bash -c "cd /var/ton-work/contracts && wallet_create.sh validator"
-docker cp ton-node-n3:/var/ton-work/contracts/validator.hexaddr ./validator3.hexaddr
-docker cp ton-node-n3:/var/ton-work/contracts/validator.pk ./validator3.pk
-V3_ADDR=$(cat validator3.hexaddr)
-
-# transfer 
-docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V0_ADDR 40000"
-sleep 10
-docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V1_ADDR 40000"
-sleep 10
-docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V2_ADDR 40000"
-sleep 10
-docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V3_ADDR 40000"
-sleep 10
-
-# check
-docker exec -it ton-node-n0 bash -c "wallet_status.sh $V0_ADDR"
-docker exec -it ton-node-n1 bash -c "wallet_status.sh $V1_ADDR"
-docker exec -it ton-node-n2 bash -c "wallet_status.sh $V2_ADDR"
-docker exec -it ton-node-n3 bash -c "wallet_status.sh $V3_ADDR"
-
-# deploy
-docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && wallet_deploy.sh validator"
-docker exec -it ton-node-n1 bash -c "cd /var/ton-work/contracts && wallet_deploy.sh validator"
-docker exec -it ton-node-n2 bash -c "cd /var/ton-work/contracts && wallet_deploy.sh validator"
-docker exec -it ton-node-n3 bash -c "cd /var/ton-work/contracts && wallet_deploy.sh validator"
+cd node3
+$SC/docker_create_storage.sh
+$SC/docker_run.sh
+source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node3.txt &
+sleep 20
+$SC/docker_export_wallet.sh y
+$SC/docker_export_conf.sh
+$SC/docker_logs.sh
+cd ..
 
 sleep 30
 
-# check
-docker exec -it ton-node-n0 bash -c "wallet_status.sh $V0_ADDR"
-docker exec -it ton-node-n1 bash -c "wallet_status.sh $V1_ADDR"
-docker exec -it ton-node-n2 bash -c "wallet_status.sh $V2_ADDR"
-docker exec -it ton-node-n3 bash -c "wallet_status.sh $V3_ADDR"
-docker exec -it ton-node-n3 bash -c "wallet_status.sh -1:3333333333333333333333333333333333333333333333333333333333333333"
-docker exec -it ton-node-n3 bash -c "wallet_status.sh -1:0000000000000000000000000000000000000000000000000000000000000000"
+# check nodes status
+cd node0
+$SC/docker_status.sh
+$SC/docker_wallet_status.sh
+cd ..
+cd node1
+$SC/docker_status.sh
+$SC/docker_wallet_status.sh
+cd ..
+cd node2
+$SC/docker_status.sh
+$SC/docker_wallet_status.sh
+cd ..
+cd node3
+$SC/docker_status.sh
+$SC/docker_wallet_status.sh
+cd ..
 
-echo "====================== Start election registration"
+V0_ADDR=$(cat node0/validator.hexaddr)
+V1_ADDR=$(cat node1/validator.hexaddr)
+V2_ADDR=$(cat node2/validator.hexaddr)
+V3_ADDR=$(cat node3/validator.hexaddr)
+
+cd node0
+# transfer
+source ./env.sh && docker exec -it $DOCKER_NAME bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V0_ADDR 100000"
+sleep 10
+source ./env.sh && docker exec -it $DOCKER_NAME bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V1_ADDR 100000"
+sleep 10
+source ./env.sh && docker exec -it $DOCKER_NAME bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V2_ADDR 100000"
+sleep 10
+source ./env.sh && docker exec -it $DOCKER_NAME bash -c "cd /var/ton-work/contracts && wallet_main_transfer.sh $V3_ADDR 100000"
+sleep 10
+cd ..
+
+cd node0
+$SC/docker_wallet_status.sh
+$SC/docker_wallet_deploy.sh
+sleep 10
+$SC/docker_wallet_status.sh
+cd ..
+cd node1
+$SC/docker_wallet_status.sh
+$SC/docker_wallet_deploy.sh
+sleep 10
+$SC/docker_wallet_status.sh
+cd ..
+cd node2
+$SC/docker_wallet_status.sh
+$SC/docker_wallet_deploy.sh
+sleep 10
+$SC/docker_wallet_status.sh
+cd ..
+cd node3
+$SC/docker_wallet_status.sh
+$SC/docker_wallet_deploy.sh
+sleep 10
+$SC/docker_wallet_status.sh
+source ./env.sh && docker exec -it  $DOCKER_NAME bash -c "wallet_status.sh -1:3333333333333333333333333333333333333333333333333333333333333333"
+source ./env.sh && docker exec -it  $DOCKER_NAME bash -c "wallet_status.sh -1:0000000000000000000000000000000000000000000000000000000000000000"
+cd ..
+
+sleep 100
 
 reap() {
-    docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && reap.sh >> /var/ton-work/logs/reap.txt 2>&1"
-    docker exec -it ton-node-n1 bash -c "cd /var/ton-work/contracts && reap.sh >> /var/ton-work/logs/reap.txt 2>&1"
-    docker exec -it ton-node-n2 bash -c "cd /var/ton-work/contracts && reap.sh >> /var/ton-work/logs/reap.txt 2>&1"
-    docker exec -it ton-node-n3 bash -c "cd /var/ton-work/contracts && reap.sh >> /var/ton-work/logs/reap.txt 2>&1"
+    source ./env.sh && docker exec -it  $DOCKER_NAME bash -c "cd /var/ton-work/contracts && reap.sh >> /var/ton-work/logs/reap.txt 2>&1"
 }
 
 participate() {
-    docker exec -it ton-node-n0 bash -c "cd /var/ton-work/contracts && participate.sh >> /var/ton-work/logs/participate.txt 2>&1"
-    docker exec -it ton-node-n1 bash -c "cd /var/ton-work/contracts && participate.sh >> /var/ton-work/logs/participate.txt 2>&1"
-    docker exec -it ton-node-n2 bash -c "cd /var/ton-work/contracts && participate.sh >> /var/ton-work/logs/participate.txt 2>&1"
-    docker exec -it ton-node-n3 bash -c "cd /var/ton-work/contracts && participate.sh >> /var/ton-work/logs/participate.txt 2>&1"
+    source ./env.sh && docker exec -it  $DOCKER_NAME bash -c "cd /var/ton-work/contracts && participate.sh >> /var/ton-work/logs/participate.txt 2>&1"
 }
 
 get_logs() {
-    docker cp ton-node-n0:/var/ton-work/logs/json-explorer.log .
-    docker cp ton-node-n0:/var/ton-work/logs/blockchain-explorer.log .
-    docker cp ton-node-n0:/var/ton-work/logs/participate.txt ./participate0.log.txt
-    docker cp ton-node-n0:/var/ton-work/logs/reap.txt ./reap0.log.txt
-    docker cp ton-node-n1:/var/ton-work/logs/participate.txt ./participate1.log.txt
-    docker cp ton-node-n1:/var/ton-work/logs/reap.txt ./reap1.log.txt
-    docker cp ton-node-n2:/var/ton-work/logs/participate.txt ./participate2.log.txt
-    docker cp ton-node-n2:/var/ton-work/logs/reap.txt ./reap2.log.txt
-    docker cp ton-node-n3:/var/ton-work/logs/participate.txt ./participate3.log.txt
-    docker cp ton-node-n3:/var/ton-work/logs/reap.txt ./reap3.log.txt
+    source ./env.sh && docker cp $DOCKER_NAME:/var/ton-work/logs/json-explorer.log .
+    source ./env.sh && docker cp $DOCKER_NAME:/var/ton-work/logs/blockchain-explorer.log .
+    source ./env.sh && docker cp $DOCKER_NAME:/var/ton-work/logs/participate.txt ./participate.log
+    source ./env.sh && docker cp $DOCKER_NAME:/var/ton-work/logs/reap.txt ./reap.log
 }
 
+cd node0
 echo "====================== Election params: "
-docker exec -it ton-node-n0 lite-client -C my-ton-global.config.json -v 0 -rc "getconfig 15" -rc "quit"
-
+source ./env.sh && docker exec -it $DOCKER_NAME lite-client -C my-ton-global.config.json -v 0 -rc "getconfig 15" -rc "quit"
+cd ..
 
 while true; do
 
-    reap
-    participate
+cd node0
+reap
+participate
+cd ..
+cd node1
+reap
+participate
+cd ..
+cd node2
+reap
+participate
+cd ..
+cd node3
+reap
+participate
+cd ..
 
-    echo "Sleep 60. Press CTRL-C for exit"
-    sleep 60
+echo "Sleep 60. Press CTRL-C for exit"
+sleep 60
 
-    get_logs
-    
-    echo "====================== WALLETS" 
-    docker exec -it ton-node-n0 bash -c "wallet_status.sh $V0_ADDR"
-    docker exec -it ton-node-n1 bash -c "wallet_status.sh $V1_ADDR"
-    docker exec -it ton-node-n2 bash -c "wallet_status.sh $V2_ADDR"
-    docker exec -it ton-node-n3 bash -c "wallet_status.sh $V3_ADDR"
-    docker exec -it ton-node-n3 bash -c "wallet_status.sh -1:3333333333333333333333333333333333333333333333333333333333333333"
+echo "====================== WALLETS"
+cd node0
+get_logs
+$SC/docker_wallet_status.sh
+cd ..
+cd node1
+get_logs
+$SC/docker_wallet_status.sh
+cd ..
+cd node2
+get_logs
+$SC/docker_wallet_status.sh
+cd ..
+cd node3
+get_logs
+$SC/docker_wallet_status.sh
+source ./env.sh && docker exec -it  $DOCKER_NAME bash -c "wallet_status.sh -1:3333333333333333333333333333333333333333333333333333333333333333"
 
-    echo "====================== UTC time" 
-    date -u +%s
 
-    echo "====================== Active election id: "
-    docker exec -it ton-node-n0 lite-client -C my-ton-global.config.json -v 0 -rc "runmethod -1:3333333333333333333333333333333333333333333333333333333333333333 active_election_id" -rc "quit" | grep "result: "
+echo "====================== UTC time"
+date -u +%s
 
-    echo "====================== Current validators: "
-    docker exec -it ton-node-n0 lite-client -C my-ton-global.config.json -v 0 -rc "getconfig 34" -rc "quit"
+echo "====================== Active election id: "
+source ./env.sh && docker exec -it $DOCKER_NAME lite-client -C my-ton-global.config.json -v 0 -rc "runmethod -1:3333333333333333333333333333333333333333333333333333333333333333 active_election_id" -rc "quit" | grep "result: "
 
-    echo "====================== Election participant list: "
-    docker exec -it ton-node-n0 lite-client -C my-ton-global.config.json -v 0 -rc "runmethod -1:3333333333333333333333333333333333333333333333333333333333333333 participant_list" -rc "quit" | grep "result: "
+echo "====================== Current validators: "
+source ./env.sh && docker exec -it $DOCKER_NAME lite-client -C my-ton-global.config.json -v 0 -rc "getconfig 34" -rc "quit"
+
+echo "====================== Election participant list: "
+source ./env.sh && docker exec -it $DOCKER_NAME lite-client -C my-ton-global.config.json -v 0 -rc "runmethod -1:3333333333333333333333333333333333333333333333333333333333333333 participant_list" -rc "quit" | grep "result: "
+cd ..
 
 done
 
 #echo "====================== Lite client cmd"
-#docker exec -it ton-node-n3 lite-client -v 0 -C my-ton-global.config.json
+# source ./env.sh && docker exec -it $DOCKER_NAME lite-client -v 0 -C my-ton-global.config.json
 # getaccount -1:0000000000000000000000000000000000000000000000000000000000000000
 # quit
 
 #sudo iftop -i lo -P
+

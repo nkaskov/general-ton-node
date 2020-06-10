@@ -1,21 +1,22 @@
 #!/bin/bash
 
+SC=../../scripts
 
 # cleanup
 
-docker stop ton-node-n0
-docker rm ton-node-n0
-docker volume rm tondb0
+cd node0
+$SC/docker_clean.sh y y n
+cd ..
 
-docker stop ton-node-n1
-docker rm ton-node-n1
-docker volume rm tondb1
+cd node1
+$SC/docker_clean.sh y y n
+cd ..
 
-docker stop ton-node-n2
-docker rm ton-node-n2
-docker volume rm tondb2
+cd node2
+$SC/docker_clean.sh y y n
+cd ..
 
-docker stop ton-node-n3
-docker rm ton-node-n3
-docker volume rm tondb3
+cd node3
+$SC/docker_clean.sh y y n
+cd ..
 

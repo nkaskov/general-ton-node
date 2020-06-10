@@ -9,7 +9,13 @@ echo "Validator key short_id "$VAL_ID_HEX
 export VAL_ID_HEX=$VAL_ID_HEX
 mv validator-keys.pub ../../contracts
 cd ../../contracts
+
+if [[ "$SANDBOX" == 1 ]]; then
+./create-state gen-zerostate.sandbox.fif
+else
 ./create-state gen-zerostate.fif
+fi
+
 ZEROSTATE_FILEHASH=$(sed ':a;N;$!ba;s/\n//g' <<<$(sed -e "s/\s//g" <<<"$(od -An -t x1 zerostate.fhash)") | awk '{ print toupper($0) }')
 mv zerostate.boc ../db/static/$ZEROSTATE_FILEHASH
 BASESTATE0_FILEHASH=$(sed ':a;N;$!ba;s/\n//g' <<<$(sed -e "s/\s//g" <<<"$(od -An -t x1 basestate0.fhash)") | awk '{ print toupper($0) }')
@@ -57,6 +63,7 @@ echo | validator-engine-console -k client -p server.pub -v 0 -a  "127.0.0.1:$CON
 echo | validator-engine-console -k client -p server.pub -v 0 -a "127.0.0.1:$CONSOLE_PORT" -rc "importf keyring/$VAL_ID_HEX" 2>&1
 kill $PRELIMINARY_VALIDATOR_RUN;
 else
+
   sleep 10
   wget -O my-ton-global.config.json ${CONFIG}
   cat my-ton-global.config.json
@@ -64,6 +71,11 @@ else
   ./node_init.sh
 
 fi
+
+# validator wallet
+cd /var/ton-work/contracts
+wallet_create.sh validator
+cd /var/ton-work/db
 
 # Liteserver
 if [ -z "$LITESERVER" ]; then
@@ -82,6 +94,7 @@ else
         LITESERVERS=$(printf "%q" "\"liteservers\":[{\"id\":\"$LITESERVER_ID2\",\"port\":\"$LITE_PORT\"}")
         sed -e "s~\"liteservers\"\ \:\ \[~$LITESERVERS~g" config.json > config.json.liteservers
         mv config.json.liteservers config.json
+
         if [[ "$GENESIS" == 1 ]]; then
           LITESERVER_PUB=$(python -c 'import codecs; f=open("liteserver.pub", "rb+"); pub=f.read()[4:]; print(codecs.encode(pub,"base64").replace("\n",""))')
           IP=$PUBLIC_IP; IPNUM=0; for (( i=0 ; i<4 ; ++i )); do ((IPNUM=$IPNUM+${IP%%.*}*$((256**$((3-${i})))))); IP=${IP#*.}; done
@@ -90,6 +103,7 @@ else
           sed -i -e "\$s#\(.*\)\}#\1,$LITESERVERSCONFIG#" my-ton-global.config.json
           python -c 'import json; f=open("my-ton-global.config.json", "r"); config=json.loads(f.read()); f.close(); f=open("my-ton-global.config.json", "w");f.write(json.dumps(config, indent=2)); f.close()';
        fi
+
     fi
 fi
 

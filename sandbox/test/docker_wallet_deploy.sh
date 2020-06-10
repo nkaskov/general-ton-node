@@ -1,0 +1,1 @@
+../../scripts/docker_wallet_deploy.sh

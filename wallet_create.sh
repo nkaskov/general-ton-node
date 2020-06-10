@@ -15,7 +15,7 @@ fi
 if test -f "$WALLET_NAME.pk"; then
     echo -n "$WALLET_NAME exist! Do you wand to overwrite it? (y/n) "
     read answer
-    if [ "$input" != "Y" ] && [ "$input" != "y" ]; then
+    if [ "$answer" != "Y" ] && [ "$answer" != "y" ]; then
         exit
     else
         echo "ok"

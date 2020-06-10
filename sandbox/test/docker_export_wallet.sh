@@ -1,0 +1,1 @@
+../../scripts/docker_export_wallet.sh
