@@ -1,21 +1,49 @@
 FROM ubuntu:18.04 as builder
 RUN apt-get update && \
-	apt-get install -y build-essential cmake clang-6.0 openssl libssl-dev zlib1g-dev gperf wget git && \
+	apt-get install -y build-essential cmake clang-6.0 openssl libssl-dev zlib1g-dev gperf wget vim tar git curl chrony ca-certificates gnupg python python3 libmicrohttpd-dev && \
 	rm -rf /var/lib/apt/lists/*
-ENV CC clang-6.0
-ENV CXX clang++-6.0
-WORKDIR /
-RUN git clone --recursive https://github.com/ton-blockchain/ton 
-WORKDIR /ton
 
-RUN mkdir build && \
-	cd build && \
-	cmake .. -DCMAKE_BUILD_TYPE=Release && \
-	make -j 4
+#if old
+#ENV CC clang-6.0
+#ENV CXX clang++-6.0
+#WORKDIR /
+#RUN git clone --recursive https://github.com/ton-blockchain/ton
+#WORKDIR /ton
+
+#RUN mkdir build && \
+#        cd build && \
+#        cmake .. -DCMAKE_BUILD_TYPE=Release && \
+#        make -j 4
+
+#else
+WORKDIR /
+RUN git clone https://gitlab.com/gram-net/gram-ton.git /ton
+RUN cd /ton && git submodule update --init --recursive --remote
+RUN mkdir /ton/build && \
+	cd /ton/build && \
+	cmake -B /ton/build -S /ton -DCMAKE_BUILD_TYPE=Release
+
+WORKDIR /ton/build
+RUN cmake --build /ton/build --target json-explorer -- -j8
+RUN cmake --build /ton/build --target blockchain-explorer -- -j8
+RUN cmake --build /ton/build --target generate-random-id -- -j8
+RUN cmake --build /ton/build --target lite-client -- -j8
+RUN cmake --build /ton/build --target validator-engine -- -j8
+RUN cmake --build /ton/build --target generate-initial-keys -- -j8
+RUN cmake --build /ton/build --target validator-engine-console -- -j8
+RUN cmake --build /ton/build --target gen_fif -- -j8
+RUN cmake --build /ton/build --target create-state -- -j8
+RUN cmake --build /ton/build --target tonlib -- -j8
+RUN cmake --build /ton/build --target tonlibjson -- -j8
+RUN cmake --build /ton/build --target tonlibjson_static -- -j8
+RUN cmake --build /ton/build --target test-ton-collator -- -j8
+RUN cmake --build /ton/build --target dht-server -- -j8
+
+#endif
 
 FROM ubuntu:18.04
 RUN apt-get update && \
-	apt-get install -y openssl wget python nano&& \
+	apt-get install -y openssl wget python nano libmicrohttpd-dev && \
 	rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /var/ton-work/db && \
 	mkdir -p /var/ton-work/db/static
@@ -24,6 +52,11 @@ COPY --from=builder /ton/build/lite-client/lite-client /usr/local/bin/
 COPY --from=builder /ton/build/validator-engine/validator-engine /usr/local/bin/
 COPY --from=builder /ton/build/validator-engine-console/validator-engine-console /usr/local/bin/
 COPY --from=builder /ton/build/utils/generate-random-id /usr/local/bin/
+
+#!
+COPY --from=builder /ton/build/json-explorer/json-explorer /usr/local/bin/
+COPY --from=builder /ton/build/blockchain-explorer/blockchain-explorer /usr/local/bin/
+#!
 
 COPY --from=builder /ton/build/test-ton-collator /usr/local/bin
 COPY --from=builder /ton/build/crypto/fift /usr/local/bin
@@ -35,6 +68,10 @@ RUN mkdir /var/ton-work/contracts
 COPY --from=builder /ton/crypto/smartcont /var/ton-work/contracts
 COPY --from=builder /ton/build/crypto/create-state /var/ton-work/contracts
 COPY --from=builder /ton/build/dht-server/dht-server /usr/local/bin
+
+
+
+
 
 WORKDIR /usr/local/bin
 COPY wallet_create.sh wallet_deploy.sh wallet_main_transfer.sh wallet_status.sh wallet_transfer.sh ./
