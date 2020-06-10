@@ -29,5 +29,18 @@ if [[ "$DHT_SERVER" == 1 ]]; then
    cd ..
 fi
 
+if [ ! -z "$LITESERVER" ]; then
+
+if [[ "$JSON_EXPLORER" == 1 ]]; then
+   echo "Start JSON explorer on $BIND_IP:$JSON_PORT"
+   json-explorer -l /var/ton-work/logs/json-explorer.log -d -H $JSON_PORT  -p /var/ton-work/db/liteserver.pub -a "127.0.0.1:$LITE_PORT" &
+fi
+if [[ "$BLOCK_EXPLORER" == 1 ]]; then
+   echo "Start BLOCKCHAIN explorer on $BIND_IP:$BLOCK_PORT"
+   blockchain-explorer -l /var/ton-work/logs/blockchain-explorer.log -d -H $BLOCK_PORT -p /var/ton-work/db/liteserver.pub -a "127.0.0.1:$LITE_PORT" &
+fi
+
+fi
+
 echo "Start validator on $BIND_IP:$PUBLIC_PORT"
 validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$BIND_IP:$PUBLIC_PORT"
