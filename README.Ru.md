@@ -2,15 +2,21 @@
 Проверялась на Ubuntu 18.04
 
 1. Скачиваем репозиторий
-```git clone https://github.com/ton-rocks/general-ton-node.git```
+```bash
+git clone https://github.com/ton-rocks/general-ton-node.git
+```
 
 2. Переходим в папку scripts
-```cd ./general-node/scripts```
+```bash
+cd ./general-node/scripts
+```
 
 Обратите внимание, далее все команды выполняются из папки scripts!
 
 3. Устанавливаем зависимости (только ubuntu, можно установить необходимые пакеты руками)
-```./system_init.sh```
+```bash
+./system_init.sh
+```
 
 Возможно, для запуска докера понадобится создать группу и добавить туда текущего пользователя
 
@@ -22,12 +28,16 @@ sudo usermod -a -G docker текущий_пользователь
 Так же желательно установить chrony (пример https://www.tecmint.com/install-chrony-in-centos-ubuntu-linux/)
 
 4. Собираем докер контейнер (будет собрана нода TON, нужно RAM не менее 4GB)
-```./docker_build.sh```
+```bash
+./docker_build.sh
+```
 
 5. Открываем файл env.sh в любом текстовом редакторе. При необходимости меняем IP и порты.
 
 6. Открываем указанные порты в файрволе. Для ubuntu команды будут выглядеть так:
-```sudo ufw allow порт```
+```bash
+sudo ufw allow порт
+```
 
 Открыть порты нужно для следующих сервисов, упомянутых в env.sh 
 ```
@@ -39,14 +49,16 @@ BLOCK_EXPLORER_PORT
 ```
 
 7. Первый запуск ноды
-```
+```bash
 ./docker_create_storage.sh
 ./docker_run.sh
 ```
 Ждём несколько минут, при первом запуске сгенерируются ключи кошелька валидатора, а так же некоторые конфиги
 
 8. Экспортируем сгенерированные файлы из контейнера
-```./docker_export_wallet.sh```
+```bash
+./docker_export_wallet.sh
+```
 
 Экспортируются следующие файлы:
 адрес и ключи кошелька валидатора
@@ -60,7 +72,9 @@ validator.pk
 
 9. Экспортируем конфигурацию
 
-```./docker_export_conf.sh```
+```bash
+./docker_export_conf.sh
+```
 
 Конфигурации DHT и lite-server
 ```
@@ -83,20 +97,27 @@ console_client
 - порты JSON_EXPLORER_PORT и BLOCK_EXPLORER_PORT (не нужно, если файл env.sh не меняли)
 
 11. Дожидаемся синхронизации ноды командой
-```./docker_status.sh```
+```bash
+./docker_status.sh
+```
 Разница между последними 2 цифрами должна быть в пределах 20
 stateserializermasterchainseqno                 589364
 shardclientmasterchainseqno                     589218
 
 12. Дожидаемся зачисления монет на кошелёк. Состояние кошелька можно проверить командой
-```./docker_wallet_status.sh```
-```Account state is EMPTY with balance 0``` говорит о том, что монет в аккаунте нет
-```Account state is UNINIT with balance 100000000000000ng``` говорит о том, на кошельке 100000 монет, но код кошелька не задеплоен
+```bash
+./docker_wallet_status.sh
+```
+```Account state is EMPTY with balance 0``` говорит о том, что монет в аккаунте нет.
 
-Состояние кошелька так же можно посмотреть в блокчейн эксплорере, который доступен у вас по BLOCK_EXPLORER_PORT порту
+```Account state is UNINIT with balance 100000000000000ng``` говорит о том, на кошельке 100000 монет, но код кошелька не задеплоен.
+
+Состояние кошелька так же можно посмотреть в блокчейн эксплорере, который доступен у вас по BLOCK_EXPLORER_PORT порту.
 
 Когда появится ненулевой баланс, кошелёк нужно задеплоить командой
-```./docker_wallet_deploy.sh```
+```bash
+./docker_wallet_deploy.sh
+```
 
 после чего состояние должно измениться на
 ```Account state is ACTIVE with balance 99999956409603ng```
@@ -105,18 +126,21 @@ shardclientmasterchainseqno                     589218
 Выполняем ```crontab -e```
 и вставляем строку
 
-```*/10 * * * *     cd путь_к_папке_scripts && ./docker_participate.sh```
+```
+*/10 * * * *     cd путь_к_папке_scripts && ./docker_participate.sh
+```
 
 13. Командой 
-```./docker_logs.sh```
+```bash
+./docker_logs.sh
+```
 можно получить логи регистрации в выборах (participate.log и reap.log)
 
 
 # Если возникают проблемы
 
 1. Получить лог ноды TON можно командой
-```./docker_node_logs.sh```
-(осторожно, он большой!)
+```./docker_node_logs.sh``` (осторожно, он большой!).
 Логи остальных сервисов и скриптов
 ```./docker_logs.sh```
 2. Состояние файрвола командой
@@ -136,15 +160,21 @@ shardclientmasterchainseqno                     589218
 # Если сменился IP
 
 1. Останавливаем запущенный контейнер
-```./docker_stop.sh```
+```bash
+./docker_stop.sh
+```
 
 2. Меняем PUBLIC_IP в файле env.sh
 
 2. Запускаем снова
-```./docker_start.sh```
+```bash
+./docker_start.sh
+```
 
 3. Выполняем команду
-```./docker_export_conf.sh```
+```bash
+./docker_export_conf.sh
+```
 
 4. Отсылаем файлы dht_node.conf и liteserver.conf
 
@@ -156,7 +186,9 @@ shardclientmasterchainseqno                     589218
 
 2. Убираем запуск скрипта из крона. 
 Запускаем ```crontab -e``` и удаляем строку
-```*/10 * * * *     cd путь_к_папке_scripts && ./docker_participate.sh```
+```
+*/10 * * * *     cd путь_к_папке_scripts && ./docker_participate.sh
+```
 
 3. На новом сервере выполняем шаги 1-7 основной инструкции
 
@@ -169,12 +201,14 @@ validator.pk
 в папку scripts
 
 5. Запускаем команду импорта ключей
-```./docker_import.sh```
+```bash
+./docker_import.sh
+```
 
 6. Выполняем шаги 9-13 основной инструкции
 
 
 # Запускаем несколько нод на 1 сервере:
 
-Проще всего сделать несколько копий папки scripts и поменять в каждой env.sh
+Проще всего сделать несколько копий папки scripts и поменять в каждой env.sh. 
 Затем выполнить все действия из инструкции в каждой папке
