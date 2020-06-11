@@ -24,32 +24,32 @@ RUN mkdir /ton/build && \
 	cmake -B /ton/build -S /ton -DCMAKE_BUILD_TYPE=Release
 
 WORKDIR /ton/build
-RUN cmake --build /ton/build --target json-explorer -- -j4
-RUN cmake --build /ton/build --target blockchain-explorer -- -j4
-RUN cmake --build /ton/build --target generate-random-id -- -j4
-RUN cmake --build /ton/build --target lite-client -- -j4
-RUN cmake --build /ton/build --target validator-engine -- -j4
-RUN cmake --build /ton/build --target generate-initial-keys -- -j4
-RUN cmake --build /ton/build --target validator-engine-console -- -j4
-RUN cmake --build /ton/build --target gen_fif -- -j4
-RUN cmake --build /ton/build --target create-state -- -j4
-RUN cmake --build /ton/build --target tonlib -- -j4
-RUN cmake --build /ton/build --target tonlibjson -- -j4
-RUN cmake --build /ton/build --target tonlibjson_static -- -j4
-RUN cmake --build /ton/build --target test-ton-collator -- -j4
-RUN cmake --build /ton/build --target dht-server -- -j4
+RUN cmake --build /ton/build --target json-explorer -- -j2
+RUN cmake --build /ton/build --target blockchain-explorer -- -j2
+RUN cmake --build /ton/build --target generate-random-id -- -j2
+RUN cmake --build /ton/build --target lite-client -- -j2
+#RUN cmake --build /ton/build --target validator-engine -- -j2
+RUN cmake --build /ton/build --target generate-initial-keys -- -j2
+RUN cmake --build /ton/build --target validator-engine-console -- -j2
+RUN cmake --build /ton/build --target gen_fif -- -j2
+RUN cmake --build /ton/build --target create-state -- -j2
+RUN cmake --build /ton/build --target tonlib -- -j2
+RUN cmake --build /ton/build --target tonlibjson -- -j2
+RUN cmake --build /ton/build --target tonlibjson_static -- -j2
+RUN cmake --build /ton/build --target test-ton-collator -- -j2
+#RUN cmake --build /ton/build --target dht-server -- -j2
 
 #endif
 
 FROM ubuntu:18.04
 RUN apt-get update && \
-	apt-get install -y openssl wget python nano libmicrohttpd-dev && \
+	apt-get install -y openssl wget python nano libmicrohttpd-dev mc && \
 	rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /var/ton-work/db && \
 	mkdir -p /var/ton-work/db/static
 
 COPY --from=builder /ton/build/lite-client/lite-client /usr/local/bin/
-COPY --from=builder /ton/build/validator-engine/validator-engine /usr/local/bin/
+#COPY --from=builder /ton/build/validator-engine/validator-engine /usr/local/bin/
 COPY --from=builder /ton/build/validator-engine-console/validator-engine-console /usr/local/bin/
 COPY --from=builder /ton/build/utils/generate-random-id /usr/local/bin/
 
@@ -67,7 +67,7 @@ COPY --from=builder /ton/crypto/fift/lib /usr/local/lib/fift
 RUN mkdir /var/ton-work/contracts
 COPY --from=builder /ton/crypto/smartcont /var/ton-work/contracts
 COPY --from=builder /ton/build/crypto/create-state /var/ton-work/contracts
-COPY --from=builder /ton/build/dht-server/dht-server /usr/local/bin
+#COPY --from=builder /ton/build/dht-server/dht-server /usr/local/bin
 
 
 
@@ -80,14 +80,11 @@ RUN chmod +x wallet_create.sh wallet_deploy.sh wallet_main_transfer.sh wallet_st
 COPY validator_scripts/participate.sh validator_scripts/reap.sh ./
 RUN chmod +x participate.sh reap.sh
 
-RUN mkdir -p /var/ton-work/logs
-RUN mkdir -p /var/ton-work/db/keyring
-WORKDIR /var/ton-work/contracts
-COPY gen-zerostate.fif ./
-COPY gen-zerostate.sandbox.fif ./
-WORKDIR /var/ton-work/db
-COPY ton-private-testnet.config.json.template node_init.sh dht_init.sh control.template prepare_network.sh init.sh clean_all.sh example.config.json ./
+RUN mkdir -p /var/ton-work
 ADD validator_scripts /var/ton-work/validator_scripts
-RUN chmod +x node_init.sh dht_init.sh prepare_network.sh init.sh clean_all.sh
 
-ENTRYPOINT ["/var/ton-work/db/init.sh"]
+WORKDIR /var/ton-work
+
+#RUN wget https://raw.githubusercontent.com/ton-rocks/network-config/master/test.rocks.config.json -O /var/ton-work/db/my-ton-global.config.json
+
+ENTRYPOINT ["/bin/bash"]
