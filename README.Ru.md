@@ -8,7 +8,7 @@ git clone https://github.com/ton-rocks/general-ton-node.git
 
 2. Переходим в папку scripts
 ```bash
-cd ./general-node/scripts
+cd ./general-ton-node/scripts
 ```
 
 Обратите внимание, далее все команды выполняются из папки scripts!
