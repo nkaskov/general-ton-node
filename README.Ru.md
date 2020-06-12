@@ -100,7 +100,7 @@ console_client
 ```bash
 ./docker_status.sh
 ```
-Разница между последними 2 цифрами должна быть в пределах 20
+Разница между 2 цифрами должна быть в пределах 20
 ```
 unixtime                        1591911995
 masterchainblocktime                    1591911769
@@ -160,15 +160,24 @@ masterchainblocktime                    1591911769
 
 # Перезапуск ноды
 
+
 1. Останавливаем командой
 ```bash
 ./docker_stop.sh
 ```
 
-2. Запускаем снова. Постоянное хранилище, созданное на этапе 7, примантируется автоматически
+2. Удаляем ноду, но оставляем хранилище
+```bash
+./docker_clean.sh
+Do you want to stop and delete node? (y/n): y
+Do you want to delete permanent storage? (y/n): n
+```
+
+3. Запускаем снова. Постоянное хранилище, созданное на этапе 7, примантируется автоматически
 ```bash
 ./docker_start.sh
 ```
+
 
 # Если сменился IP
 
@@ -251,6 +260,16 @@ lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "runmethod -1
 Список текущих валидаторов
 ```bash
 lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "getconfig 34" -rc "quit"
+```
+
+Список следующих валидаторов
+```bash
+lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "getconfig 36" -rc "quit"
+```
+
+Список предыдущих валидаторов
+```bash
+lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "getconfig 32" -rc "quit"
 ```
 
 Список выборов, в которых участвовал валидатор
