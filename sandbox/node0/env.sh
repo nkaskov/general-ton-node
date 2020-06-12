@@ -1,8 +1,8 @@
 export REPO_PATH=../..
 
 export IMAGE_NAME="ton-rocks-image"
-export DOCKER_NAME="ton-rocks-node0"
-export VOLUME_NAME="ton-rocks-db0"
+export DOCKER_NAME="ton-rocks-nodes0"
+export VOLUME_NAME="ton-rocks-dbs0"
 
 export PUBLIC_IP=127.0.0.1
 #export PUBLIC_IP=$(curl -sS 2ip.ru)
@@ -19,5 +19,5 @@ export BLOCK_EXPLORER_PORT=8083
 export GENESIS=1
 export HTTP_PORT=8080
 #export CONFIG="http://127.0.0.1:${HTTP_PORT}/my-ton-global.config.json"
-export SANDBOX=0
+export SANDBOX=1
 

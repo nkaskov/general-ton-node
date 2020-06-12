@@ -1,8 +1,8 @@
 export REPO_PATH=../..
 
 export IMAGE_NAME="ton-rocks-image"
-export DOCKER_NAME="ton-rocks-node"
-export VOLUME_NAME="ton-rocks-db"
+export DOCKER_NAME="ton-rocks-nodet0"
+export VOLUME_NAME="ton-rocks-dbt0"
 
 export CONFIG="http://127.0.0.1:8080/my-ton-global.config.json"
 

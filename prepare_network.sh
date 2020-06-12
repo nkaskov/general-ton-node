@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -x
+echo "Environment:"
+printenv
 if [[ "$GENESIS" == 1 ]]; then
 cd keyring
 read -r VAL_ID_HEX VAL_ID_BASE64 <<< $(generate-random-id -m keys -n validator)
@@ -11,6 +13,7 @@ mv validator-keys.pub ../../contracts
 cd ../../contracts
 
 if [[ "$SANDBOX" == 1 ]]; then
+echo "Using sandbox parameters"
 ./create-state gen-zerostate.sandbox.fif
 else
 ./create-state gen-zerostate.fif

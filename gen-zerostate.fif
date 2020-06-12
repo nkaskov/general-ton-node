@@ -136,10 +136,10 @@ Masterchain swap
 // max-validators max-main-validators min-validators
 1000 100 5 config.validator_num!
 // min-stake max-stake min-total-stake max-factor
-GR$10000 GR$10000000 GR$100000 sg~3 config.validator_stake_limits!
+GR$10000 GR$10000000 GR$50000 sg~3 config.validator_stake_limits!
 // elected-for elect-start-before elect-end-before stakes-frozen-for
 // 400000 200000 4000 400000 config.election_params!
-65536 32768 8192 32768 config.election_params!  // DEBUG
+32768 16384 4096 16384 config.election_params!  // DEBUG
 // config-addr = -1:5555...5555
 AllOnes 5 * constant config_addr
 config_addr config.config_smc!
@@ -192,7 +192,7 @@ GR$100 1 500 config.complaint_prices!
 // 17 add-validator
 // newkeypair nip dup ."Validator #2 public key = " Bx. cr
 // 239 add-validator
-2000 =: orig_vset_valid_for  // original validator set valid 2000 seconds
+16384 =: orig_vset_valid_for  // original validator set valid 16384 seconds
 now dup orig_vset_valid_for + 0 config.validators!
 
 /*

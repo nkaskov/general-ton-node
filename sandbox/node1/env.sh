@@ -1,8 +1,8 @@
 export REPO_PATH=../..
 
 export IMAGE_NAME="ton-rocks-image"
-export DOCKER_NAME="ton-rocks-node1"
-export VOLUME_NAME="ton-rocks-db1"
+export DOCKER_NAME="ton-rocks-nodes1"
+export VOLUME_NAME="ton-rocks-dbs1"
 
 export PUBLIC_IP=127.0.0.1
 #export PUBLIC_IP=$(curl -sS 2ip.ru)

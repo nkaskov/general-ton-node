@@ -3,7 +3,7 @@ SC=../../scripts
 cd node0
 $SC/docker_create_storage.sh
 $SC/docker_run.sh
-source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node0.txt &
+source ./env.sh && echo > live-node.txt && docker logs --follow $DOCKER_NAME >> live-node.txt &
 sleep 100
 $SC/docker_export_wallet.sh y
 $SC/docker_export_conf.sh
@@ -14,7 +14,7 @@ cd ..
 cd node1
 $SC/docker_create_storage.sh
 $SC/docker_run.sh
-source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node1.txt &
+source ./env.sh && echo > live-node.txt && docker logs --follow $DOCKER_NAME >> live-node.txt &
 sleep 20
 $SC/docker_export_wallet.sh y
 $SC/docker_export_conf.sh
@@ -24,7 +24,7 @@ cd ..
 cd node2
 $SC/docker_create_storage.sh
 $SC/docker_run.sh
-source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node2.txt &
+source ./env.sh && echo > live-node.txt && docker logs --follow $DOCKER_NAME >> live-node.txt &
 sleep 20
 $SC/docker_export_wallet.sh y
 $SC/docker_export_conf.sh
@@ -34,7 +34,7 @@ cd ..
 cd node3
 $SC/docker_create_storage.sh
 $SC/docker_run.sh
-source ./env.sh && docker logs --follow $DOCKER_NAME >> live-node3.txt &
+source ./env.sh && echo > live-node.txt && docker logs --follow $DOCKER_NAME >> live-node.txt &
 sleep 20
 $SC/docker_export_wallet.sh y
 $SC/docker_export_conf.sh
@@ -124,7 +124,7 @@ get_logs() {
 
 cd node0
 echo "====================== Election params: "
-source ./env.sh && docker exec -it $DOCKER_NAME lite-client -C my-ton-global.config.json -v 0 -rc "getconfig 15" -rc "quit"
+source ./env.sh && docker exec -it $DOCKER_NAME lite-client -C my-ton-global.config.json -v 0 -rc "getconfig 15"  -rc "getconfig 16" -rc "getconfig 17" -rc "quit"
 cd ..
 
 while true; do

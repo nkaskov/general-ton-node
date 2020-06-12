@@ -75,7 +75,7 @@ else
 fi
 
 echo "Run cmd: docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,target=/var/ton-work/db --network host \
-    -e \"GENESIS=$GENESIS\" -e \"SERVECONFIG=$SERVECONFIG\" -e \"HTTPPORT=$HTTP_PORT\" \
+    -e \"GENESIS=$GENESIS\" -e \"SANDBOX=$SANDBOX\" -e \"SERVECONFIG=$SERVECONFIG\" -e \"HTTPPORT=$HTTP_PORT\" \
     -e \"CONFIG=$CONFIG\" \
     -e \"PUBLIC_IP=$PUBLIC_IP\" -e \"BIND_IP=$BIND_IP\" \
     -e \"DHT_SERVER=$DHT_SERVER\" -e \"DHT_PORT=$DHT_PORT\" \
@@ -86,7 +86,7 @@ echo "Run cmd: docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,tar
     -it $IMAGE_NAME"
 
 docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,target=/var/ton-work/db --network host \
-    -e "GENESIS=$GENESIS" -e "SERVECONFIG=$SERVECONFIG" -e "HTTPPORT=$HTTP_PORT" \
+    -e "GENESIS=$GENESIS" -e "SANDBOX=$SANDBOX" -e "SERVECONFIG=$SERVECONFIG" -e "HTTPPORT=$HTTP_PORT" \
     -e "CONFIG=$CONFIG" \
     -e "PUBLIC_IP=$PUBLIC_IP" -e "BIND_IP=$BIND_IP" \
     -e "DHT_SERVER=$DHT_SERVER" -e "DHT_PORT=$DHT_PORT" \
