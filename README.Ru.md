@@ -156,8 +156,19 @@ masterchainblocktime                    1591911769
 6. Скорость сети
 ```https://www.speedtest.net/ru/apps/cli```
 7. Состояние сети
-```sudo iftop -i lo -P```
+```sudo iftop```
 
+# Перезапуск ноды
+
+1. Останавливаем командой
+```bash
+./docker_stop.sh
+```
+
+2. Запускаем снова. Постоянное хранилище, созданное на этапе 7, примантируется автоматически
+```bash
+./docker_start.sh
+```
 
 # Если сменился IP
 
@@ -210,10 +221,52 @@ validator.pk
 6. Выполняем шаги 9-14 основной инструкции
 
 
+
 # Запускаем несколько нод на 1 сервере
 
 Проще всего сделать несколько копий папки scripts и поменять в каждой env.sh. 
 Затем выполнить все действия из инструкции в каждой папке
+
+# Что ещё?
+Входим в контейнер
+```bash
+./docker_bash.sh
+```
+
+Параметры выборов
+```bash
+lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "getconfig 15" -rc "getconfig 16" -rc "getconfig 17" -rc "quit"
+```
+
+Номер текущих выборов (0 - выборов нет)
+```bash
+lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "runmethod -1:3333333333333333333333333333333333333333333333333333333333333333 active_election_id" -rc "quit" | grep "result: "
+```
+
+Список public ключей (в формате int) зарегистрированных участников выборов
+```bash
+lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "runmethod -1:3333333333333333333333333333333333333333333333333333333333333333 participant_list" -rc "quit" | grep "result: "
+```
+
+Список текущих валидаторов
+```bash
+lite-client -C /var/ton-work/db/my-ton-global.config.json -v 0 -rc "getconfig 34" -rc "quit"
+```
+
+Список выборов, в которых участвовал валидатор
+```bash
+ls /var/ton-work/contracts/*.elect
+```
+В самих файлах находятся параметры участия, в т.ч. public ключ в формате base64 (PUBKEY=)
+Перевести public ключ в int можно командой
+```bash
+python -c "k='ваш_PUBKEY'; import base64; import codecs; print(int(codecs.encode(base64.b64decode(k)[4:], 'hex'), 16))"
+```
+а в hex формат
+```bash
+python -c "k='ваш_PUBKEY'; import base64; import codecs; print('%x' % int(codecs.encode(base64.b64decode(k)[4:], 'hex'), 16))"
+```
+
 
 # Запускаем песочницу
 
