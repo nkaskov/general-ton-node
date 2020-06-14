@@ -60,7 +60,7 @@ if [ ! -z "$LITESERVER" ]; then
 
    if [[ "$JSON_EXPLORER" == 1 ]]; then
       echo "Start JSON explorer on $BIND_IP:$JSON_PORT"
-      json-explorer.sh &
+      json_explorer.sh &
    fi
    if [[ "$BLOCK_EXPLORER" == 1 ]]; then
       echo "Start BLOCKCHAIN explorer on $BIND_IP:$BLOCK_PORT"
