@@ -72,4 +72,10 @@ if [ ! -z "$LITESERVER" ]; then
 fi
 
 echo "Start validator on $BIND_IP:$PUBLIC_PORT"
-validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$BIND_IP:$PUBLIC_PORT"  > "/var/ton-work/logs/node.log" 2>&1
+while [ 1 = 1 ]
+do
+validator-engine -C /var/ton-work/db/my-ton-global.config.json --db /var/ton-work/db --ip "$BIND_IP:$PUBLIC_PORT"  >> /var/ton-work/logs/node.log 2>&1
+date -u  >> /var/ton-work/logs/node.log
+echo "validator-engine exited" >> /var/ton-work/logs/node.log
+done
+
