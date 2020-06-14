@@ -12,6 +12,8 @@ fi
 
 if ( [ -d "state" ] && [ "$(ls -A ./state)" ]); then
   echo "Found non-empty state; Skip initialization";
+  wget -O my-ton-global.config.json ${CONFIG}
+  cat ${CONFIG}
 else
   echo "Initializing network";
   ./prepare_network.sh
