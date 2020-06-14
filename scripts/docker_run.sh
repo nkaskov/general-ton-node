@@ -74,7 +74,7 @@ else
     BLOCK_EXPLORER=0
 fi
 
-echo "Run cmd: docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,target=/var/ton-work/db --network host \
+echo "Run cmd: docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,target=/var/ton-work --network host \
     -e \"GENESIS=$GENESIS\" -e \"SANDBOX=$SANDBOX\" -e \"SERVECONFIG=$SERVECONFIG\" -e \"HTTPPORT=$HTTP_PORT\" \
     -e \"CONFIG=$CONFIG\" \
     -e \"PUBLIC_IP=$PUBLIC_IP\" -e \"BIND_IP=$BIND_IP\" \
@@ -85,7 +85,7 @@ echo "Run cmd: docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,tar
     -e \"BLOCK_EXPLORER=$BLOCK_EXPLORER\" -e \"BLOCK_PORT=$BLOCK_EXPLORER_PORT\" \
     -it $IMAGE_NAME"
 
-docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,target=/var/ton-work/db --network host \
+docker run -d --name $DOCKER_NAME --mount source=$VOLUME_NAME,target=/var/ton-work --network host \
     -e "GENESIS=$GENESIS" -e "SANDBOX=$SANDBOX" -e "SERVECONFIG=$SERVECONFIG" -e "HTTPPORT=$HTTP_PORT" \
     -e "CONFIG=$CONFIG" \
     -e "PUBLIC_IP=$PUBLIC_IP" -e "BIND_IP=$BIND_IP" \

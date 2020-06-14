@@ -60,11 +60,11 @@ if [ ! -z "$LITESERVER" ]; then
 
    if [[ "$JSON_EXPLORER" == 1 ]]; then
       echo "Start JSON explorer on $BIND_IP:$JSON_PORT"
-      json-explorer -l /var/ton-work/logs/json-explorer.log -d -H $JSON_PORT  -p /var/ton-work/db/liteserver.pub -a "127.0.0.1:$LITE_PORT" &
+      json-explorer.sh &
    fi
    if [[ "$BLOCK_EXPLORER" == 1 ]]; then
       echo "Start BLOCKCHAIN explorer on $BIND_IP:$BLOCK_PORT"
-      blockchain-explorer -l /var/ton-work/logs/blockchain-explorer.log -d -H $BLOCK_PORT -p /var/ton-work/db/liteserver.pub -a "127.0.0.1:$LITE_PORT" &
+      block_explorer.sh &
    fi
 
 fi
