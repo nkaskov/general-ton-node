@@ -44,7 +44,7 @@ if [[ "$DHT_SERVER" == 1 ]]; then
                 \"expire_at\": 0
             }")
 
-   dht-server -C my-ton-global.config.json -D . -I "$BIND_IP:$DHT_PORT"&
+   dht_server.sh &
    cd ..
    echo $DHT_NODES > ./dht_node.conf
 fi

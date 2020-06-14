@@ -13,3 +13,4 @@ docker cp $DOCKER_NAME:/var/ton-work/logs/json-explorer.log .
 docker cp $DOCKER_NAME:/var/ton-work/logs/blockchain-explorer.log .
 docker cp $DOCKER_NAME:/var/ton-work/logs/participate.txt ./participate.log
 docker cp $DOCKER_NAME:/var/ton-work/logs/reap.txt ./reap.log
+docker cp $DOCKER_NAME:/var/ton-work/logs/dht-server.log ./dht-server.log
