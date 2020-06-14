@@ -80,6 +80,9 @@ RUN chmod +x wallet_create.sh wallet_deploy.sh wallet_main_transfer.sh wallet_st
 COPY validator_scripts/participate.sh validator_scripts/reap.sh ./
 RUN chmod +x participate.sh reap.sh
 
+COPY json-explorer.sh block_explorer.sh ./
+RUN chmod +x json-explorer.sh block_explorer.sh
+
 RUN mkdir -p /var/ton-work/logs
 RUN mkdir -p /var/ton-work/db/keyring
 WORKDIR /var/ton-work/contracts
