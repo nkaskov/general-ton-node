@@ -6,6 +6,8 @@ export VOLUME_NAME="ton-rocks-db"
 
 export CONFIG="https://raw.githubusercontent.com/ton-rocks/network-config/master/test.rocks.config.json"
 
+export CORE_COUNT=$((`grep processor /proc/cpuinfo | wc -l` * 2 + 1 ))
+
 #export PUBLIC_IP=127.0.0.1
 export PUBLIC_IP=$(curl -sS 2ip.ru)
 export BIND_IP=0.0.0.0

@@ -1,4 +1,6 @@
 FROM ubuntu:18.04 as builder
+ARG core_count
+ENV env_core_count=$core_count 
 RUN apt-get update && \
 	apt-get install -y build-essential cmake clang-6.0 openssl libssl-dev zlib1g-dev gperf wget vim tar git curl chrony ca-certificates gnupg python python3 libmicrohttpd-dev && \
 	rm -rf /var/lib/apt/lists/*
@@ -24,20 +26,20 @@ RUN mkdir /ton/build && \
 	cmake -B /ton/build -S /ton -DCMAKE_BUILD_TYPE=Release
 
 WORKDIR /ton/build
-RUN cmake --build /ton/build --target json-explorer -- -j2
-RUN cmake --build /ton/build --target blockchain-explorer -- -j2
-RUN cmake --build /ton/build --target generate-random-id -- -j2
-RUN cmake --build /ton/build --target lite-client -- -j2
-RUN cmake --build /ton/build --target validator-engine -- -j2
-RUN cmake --build /ton/build --target generate-initial-keys -- -j2
-RUN cmake --build /ton/build --target validator-engine-console -- -j2
-RUN cmake --build /ton/build --target gen_fif -- -j2
-RUN cmake --build /ton/build --target create-state -- -j2
-RUN cmake --build /ton/build --target tonlib -- -j2
-RUN cmake --build /ton/build --target tonlibjson -- -j2
-RUN cmake --build /ton/build --target tonlibjson_static -- -j2
-RUN cmake --build /ton/build --target test-ton-collator -- -j2
-RUN cmake --build /ton/build --target dht-server -- -j2
+RUN cmake --build /ton/build --target json-explorer -- -j$env_core_count
+RUN cmake --build /ton/build --target blockchain-explorer -- -j$env_core_count
+RUN cmake --build /ton/build --target generate-random-id -- -j$env_core_count
+RUN cmake --build /ton/build --target lite-client -- -j$env_core_count
+RUN cmake --build /ton/build --target validator-engine -- -j$env_core_count
+RUN cmake --build /ton/build --target generate-initial-keys -- -j$env_core_count
+RUN cmake --build /ton/build --target validator-engine-console -- -j$env_core_count
+RUN cmake --build /ton/build --target gen_fif -- -j$env_core_count
+RUN cmake --build /ton/build --target create-state -- -j$env_core_count
+RUN cmake --build /ton/build --target tonlib -- -j$env_core_count
+RUN cmake --build /ton/build --target tonlibjson -- -j$env_core_count
+RUN cmake --build /ton/build --target tonlibjson_static -- -j$env_core_count
+RUN cmake --build /ton/build --target test-ton-collator -- -j$env_core_count
+RUN cmake --build /ton/build --target dht-server -- -j$env_core_count
 
 #endif
 
