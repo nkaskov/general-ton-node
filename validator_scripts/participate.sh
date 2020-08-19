@@ -42,7 +42,7 @@ FIFTBIN="fift"
 export FIFTPATH="/usr/local/lib/fift/"
 LITECLIENT="lite-client"
 LITECLIENT_CONFIG="/var/ton-work/db/my-ton-global.config.json"
-LITECLIENT_EXTRA="-t 30 -p /var/ton-work/db/liteserver.pub -a 127.0.0.1:${LITE_PORT}"
+LITECLIENT_EXTRA="-t 300 -p /var/ton-work/db/liteserver.pub -a 127.0.0.1:${LITE_PORT}"
 VALIDATOR_CONSOLE="validator-engine-console"
 NODEHOST="127.0.0.1:$CONSOLE_PORT" # Full Node IP:HOST
 export CONTRACTS_PATH="/var/ton-work/contracts/"
@@ -140,15 +140,27 @@ if [ ! -f "${ELECTION_TIMESTAMP}.participated" ]; then
     # Sending request
 
     echo "${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" 2> >(grep 'x{'| tail -n1|cut -c 4-|cut -c -8)"
-WALLET_SEQ=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
+    WALLET_SEQ=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
 
     echo "${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE -1:${ACTIVE_ELECTION_ID} 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc"
 
 #    ${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE -1:${ACTIVE_ELECTION_ID} 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc
 # Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF
-${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc
-    ${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "sendfile wallet-query.boc"
-    touch ${ELECTION_TIMESTAMP}.participated
+    ${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc
+    
+    for i in 1 2 3 4 5
+    do
+        echo "${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c sendfile wallet-query.boc"
+        ${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "sendfile wallet-query.boc"
+        sleep 10
+        WALLET_SEQ_NEW=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
+        echo "new seq $WALLET_SEQ_NEW"
+        if ["$WALLET_SEQ_NEW" != "$WALLET_SEQ"]; do
+            touch ${ELECTION_TIMESTAMP}.participated
+            echo "Participate done"
+        fi
+    done
+
 else
     echo "already participated"
 fi
