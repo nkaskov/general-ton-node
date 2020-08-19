@@ -7,4 +7,8 @@ fi
 
 . ./env.sh
 
-docker volume create $VOLUME_NAME
+if [ -z "$VOLUME_NAME" ]; then
+  echo "No volume created"
+else
+  docker volume create $VOLUME_NAME
+fi

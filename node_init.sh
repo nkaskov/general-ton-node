@@ -15,10 +15,16 @@ if [ ! -z "$PUBLIC_IP" ]; then
         echo "Generated keys:"
         ls keyring/
 
+        echo "Initial config:"
+        cat config.json
+
+        DHT_KEY=$(python -c "f = open('config.json', 'r'); import json; j = json.load(f); k = j['dht'][0]['id']; import base64; import codecs; print('%064X' % int(codecs.encode(base64.b64decode(k), 'hex'), 16))")
+        echo "DHT key: $DHT_KEY"
+
         IP=$PUBLIC_IP; IPNUM=0; for (( i=0 ; i<4 ; ++i )); do ((IPNUM=$IPNUM+${IP%%.*}*$((256**$((3-${i})))))); IP=${IP#*.}; done
         [ $IPNUM -gt $((2**31)) ] && IPNUM=$(($IPNUM - $((2**32))))
 
-        DHT_NODES=$(generate-random-id -m dht -k /var/ton-work/db/keyring/* -a "{
+        DHT_NODES=$(generate-random-id -m dht -k /var/ton-work/db/keyring/$DHT_KEY -a "{
                     \"@type\": \"adnl.addressList\",
                     \"addrs\": [
                     {
@@ -32,7 +38,7 @@ if [ ! -z "$PUBLIC_IP" ]; then
                     \"priority\": 0,
                     \"expire_at\": 0
                 }")
-        echo $DHT_NODES > ./dht_validator.conf
+        echo $DHT_NODES > ./dht_node.conf
     fi
 
 else

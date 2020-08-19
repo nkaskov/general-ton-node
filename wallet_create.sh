@@ -30,6 +30,7 @@ rm -f "$WALLET_NAME-query.boc"
 # create new wallet by validator
 RES=$(fift -s /var/ton-work/contracts/new-wallet.fif $CHAIN $WALLET_NAME | grep "new wallet address" | cut -c 22-)
 echo -n $RES >"$WALLET_NAME.hexaddr"
+cp "$WALLET_NAME-query.boc" "$WALLET_NAME-deploy-query.boc"
 
 echo "Created new wallet in filebase ${WALLET_NAME} with address ${RES}"
 # files:

@@ -43,7 +43,7 @@ else
 
 ./node_init.sh
 
-DHT_NODES=$(cat ./dht_validator.conf)
+DHT_NODES=$(cat ./dht_node.conf)
 sed -i -e "s#NODES#$(printf "%q" $DHT_NODES)#g" my-ton-global.config.json
 
 fi
@@ -69,7 +69,6 @@ else
 
   sleep 10
   wget -O my-ton-global.config.json ${CONFIG}
-  cat my-ton-global.config.json
   ./dht_init.sh
   ./node_init.sh
 
@@ -110,3 +109,5 @@ else
     fi
 fi
 
+echo "Using this global config:"
+cat my-ton-global.config.json

@@ -7,9 +7,7 @@ fi
 
 . ./env.sh
 
-if [ -n "$DHT_PORT" ]; then
-    docker cp $DOCKER_NAME:/var/ton-work/db/dht_node.conf .
-fi
+docker cp $DOCKER_NAME:/var/ton-work/db/dht_node.conf .
 
 if [ -n "$LITE_PORT" ]; then
     docker cp $DOCKER_NAME:/var/ton-work/db/liteserver.conf .

@@ -41,12 +41,20 @@ sudo ufw allow порт
 
 Открыть порты нужно для следующих сервисов, упомянутых в env.sh 
 ```
-DHT_PORT
 ADNL_PORT
 LITE_PORT
-JSON_EXPLORER_PORT
+WS_PORT
 BLOCK_EXPLORER_PORT
 ```
+
+Возможно так же указать рабочую директорию TON_DIR для докер контейнера вместо VOLUME_NAME
+```bash
+#export VOLUME_NAME="ton-rocks-db"
+# or
+export TON_DIR="/var/ton-work"
+```
+В этом случае база данных, логи и вспомогательные файлы будут располагаться в директории TON_DIR.
+
 
 7. Первый запуск ноды
 ```bash
@@ -94,16 +102,15 @@ console_client
 10. Отправляем запрос на тестовые монеты. В запросе указываем следующую информацию:
 - адрес кошелька валидатора, из файла validator.hexaddr
 - содержимое файлов dht_node.conf и liteserver.conf
-- порты JSON_EXPLORER_PORT и BLOCK_EXPLORER_PORT (не нужно, если файл env.sh не меняли)
+- порт BLOCK_EXPLORER_PORT (не нужно, если файл env.sh не меняли)
 
 11. Дожидаемся синхронизации ноды командой
 ```bash
 ./docker_status.sh
 ```
-Разница между 2 цифрами должна быть в пределах 20
+Разница TIME_DIFF должна быть в пределах 20
 ```
-unixtime                        1591911995
-masterchainblocktime                    1591911769
+INFO: TIME_DIFF = -4
 ```
 
 12. Дожидаемся зачисления монет на кошелёк. Состояние кошелька можно проверить командой
@@ -175,7 +182,7 @@ Do you want to delete permanent storage? (y/n): n
 
 3. Запускаем снова. Постоянное хранилище, созданное на этапе 7, примантируется автоматически
 ```bash
-./docker_start.sh
+./docker_run.sh
 ```
 
 
@@ -188,17 +195,24 @@ Do you want to delete permanent storage? (y/n): n
 
 2. Меняем PUBLIC_IP в файле env.sh
 
-2. Запускаем снова
+3. Удаляем ноду, но оставляем хранилище
 ```bash
-./docker_start.sh
+./docker_clean.sh
+Do you want to stop and delete node? (y/n): y
+Do you want to delete permanent storage? (y/n): n
 ```
 
-3. Выполняем команду
+4. Запускаем снова
+```bash
+./docker_run.sh
+```
+
+5. Выполняем команду
 ```bash
 ./docker_export_conf.sh
 ```
 
-4. Отсылаем файлы dht_node.conf и liteserver.conf
+6. Отсылаем файлы dht_node.conf и liteserver.conf
 
 
 # Перенос ноды на другой сервер

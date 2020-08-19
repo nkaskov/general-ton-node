@@ -1,0 +1,9 @@
+/var/ton-work/logs/node.log {
+  daily
+  rotate 14
+  dateext
+  copytruncate
+  compress
+  missingok
+  notifempty
+}

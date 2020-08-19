@@ -42,6 +42,7 @@ FIFTBIN="fift"
 export FIFTPATH="/usr/local/lib/fift/"
 LITECLIENT="lite-client"
 LITECLIENT_CONFIG="/var/ton-work/db/my-ton-global.config.json"
+LITECLIENT_EXTRA="-t 30 -p /var/ton-work/db/liteserver.pub -a 127.0.0.1:${LITE_PORT}"
 VALIDATOR_CONSOLE="validator-engine-console"
 NODEHOST="127.0.0.1:$CONSOLE_PORT" # Full Node IP:HOST
 export CONTRACTS_PATH="/var/ton-work/contracts/"
@@ -78,9 +79,9 @@ load_vars() {
 
 check_bins
 
-ACTIVE_ELECTION_ID=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getconfig 1" |grep x{|sed -e 's/{/\ /g' -e 's/}//g'|awk {'print $2'})
+ACTIVE_ELECTION_ID=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getconfig 1" |grep x{|sed -e 's/{/\ /g' -e 's/}//g'|awk {'print $2'})
 
-ELECTION_TIMESTAMP=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "runmethod -1:${ACTIVE_ELECTION_ID} active_election_id" |grep -m1 result|awk {'print $3'})
+ELECTION_TIMESTAMP=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "runmethod -1:${ACTIVE_ELECTION_ID} active_election_id" |grep -m1 result|awk {'print $3'})
 
 if [ "$ELECTION_TIMESTAMP" -eq "0" ]; then
    echo "No active election, exiting";
@@ -138,15 +139,15 @@ if [ ! -f "${ELECTION_TIMESTAMP}.participated" ]; then
 
     # Sending request
 
-    echo "${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getaccount ${WALLET_ADDR}" 2> >(grep 'x{'| tail -n1|cut -c 4-|cut -c -8)"
-WALLET_SEQ=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
+    echo "${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" 2> >(grep 'x{'| tail -n1|cut -c 4-|cut -c -8)"
+WALLET_SEQ=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
 
     echo "${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE -1:${ACTIVE_ELECTION_ID} 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc"
 
 #    ${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE -1:${ACTIVE_ELECTION_ID} 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc
 # Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF
 ${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF 0x${WALLET_SEQ##+(0)} ${STAKE_AMOUNT}. -B validator-query.boc
-    ${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "sendfile wallet-query.boc"
+    ${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "sendfile wallet-query.boc"
     touch ${ELECTION_TIMESTAMP}.participated
 else
     echo "already participated"

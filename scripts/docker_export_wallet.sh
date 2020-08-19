@@ -22,7 +22,7 @@ docker cp $DOCKER_NAME:/var/ton-work/contracts/validator.addr .
 docker cp $DOCKER_NAME:/var/ton-work/contracts/validator.pk .
 
 if [ "$GENESIS" == "1" ]; then
-    docker cp $DOCKER_NAME:/var/ton-work/db/my-ton-global.config.json .
+    docker cp $DOCKER_NAME:/var/ton-work/db/initial-ton-global.config.json .
     docker cp $DOCKER_NAME:/var/ton-work/contracts/main-wallet.addr .
     docker cp $DOCKER_NAME:/var/ton-work/contracts/main-wallet.pk .
     docker cp $DOCKER_NAME:/var/ton-work/contracts/config-master.addr .
