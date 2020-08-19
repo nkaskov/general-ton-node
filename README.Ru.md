@@ -47,6 +47,15 @@ WS_PORT
 BLOCK_EXPLORER_PORT
 ```
 
+Возможно так же указать рабочую директорию TON_DIR для докер контейнера вместо VOLUME_NAME
+```bash
+#export VOLUME_NAME="ton-rocks-db"
+# or
+export TON_DIR="/var/ton-work"
+```
+В этом случае база данных, логи и вспомогательные файлы будут располагаться в директории TON_DIR.
+
+
 7. Первый запуск ноды
 ```bash
 ./docker_create_storage.sh
@@ -99,10 +108,9 @@ console_client
 ```bash
 ./docker_status.sh
 ```
-Разница между 2 цифрами должна быть в пределах 20
+Разница TIME_DIFF должна быть в пределах 20
 ```
-unixtime                        1591911995
-masterchainblocktime                    1591911769
+INFO: TIME_DIFF = -4
 ```
 
 12. Дожидаемся зачисления монет на кошелёк. Состояние кошелька можно проверить командой

@@ -2,9 +2,10 @@ export REPO_PATH=..
 
 export IMAGE_NAME="ton-rocks-image"
 export DOCKER_NAME="ton-rocks-node"
-export VOLUME_NAME="ton-rocks-db"
 
-export TON_DIR="/var/ton-work"
+export VOLUME_NAME="ton-rocks-db"
+# or
+#export TON_DIR="/var/ton-work"
 
 export CONFIG="https://raw.githubusercontent.com/Battlelore21/network-config/master/testnet2.config.json"
 export TON_REPO="https://github.com/Battlelore21/ton.git"
