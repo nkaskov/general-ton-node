@@ -30,6 +30,7 @@ date -u +%s
 
 LITECLIENT="lite-client"
 LITECLIENT_CONFIG="/var/ton-work/db/my-ton-global.config.json"
+LITECLIENT_EXTRA="-t 30 -p /var/ton-work/db/liteserver.pub -a 127.0.0.1:${LITE_PORT}"
 FIFTBIN="fift"
 export FIFTPATH="/usr/local/lib/fift/"
 WALLET_FIF=$CONTRACTS_PATH"wallet.fif"
@@ -37,9 +38,9 @@ WALLETKEYS_DIR="/var/ton-work/contracts/"
 VALIDATOR_WALLET_FILEBASE="validator"
 WALLET_ADDR=$(cat $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE.hexaddr)
 
-ACTIVE_ELECTION_ID=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getconfig 1" |grep x{|sed -e 's/{/\ /g' -e 's/}//g'|awk {'print $2'})
+ACTIVE_ELECTION_ID=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getconfig 1" |grep x{|sed -e 's/{/\ /g' -e 's/}//g'|awk {'print $2'})
 
-${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -rc "runmethod Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF compute_returned_stake 0x$(echo "${WALLET_ADDR}" | cut -d ':' -f 2)" -rc "quit" >"recover-state"
+${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -rc "runmethod Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF compute_returned_stake 0x$(echo "${WALLET_ADDR}" | cut -d ':' -f 2)" -rc "quit" >"recover-state"
 awk '{
         if ($1 == "result:") {
             print $3
@@ -53,7 +54,7 @@ if [ "$RETURNED_STAKE" == "0" ]; then
     exit
 fi
 
-WALLET_SEQ=$(${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
+WALLET_SEQ=$(${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "getaccount ${WALLET_ADDR}" |grep 'x{'| tail -n1|cut -c 4-|cut -c -8)
 
 echo "${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE -1:${ACTIVE_ELECTION_ID} 0x${WALLET_SEQ} 1. -B recover-query.boc"
 
@@ -63,4 +64,4 @@ ${FIFTBIN} -s $CONTRACTS_PATH"recover-stake.fif"
 ${FIFTBIN} -s ${WALLET_FIF} $WALLETKEYS_DIR$VALIDATOR_WALLET_FILEBASE Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF 0x${WALLET_SEQ} 1. -B recover-query.boc
 
 
-${LITECLIENT} -C ${LITECLIENT_CONFIG} -v 0 -c "sendfile wallet-query.boc"
+${LITECLIENT} ${LITECLIENT_EXTRA} -v 0 -c "sendfile wallet-query.boc"
