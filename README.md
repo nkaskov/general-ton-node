@@ -1,1 +1,4 @@
-see README.Ru.md
+# Полная нода сети TON
+
+[Инструкция для валидатора](README.Ru.md)
+[Инструкция по запуску сети](README.launch.Ru.md)
